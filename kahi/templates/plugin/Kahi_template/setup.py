@@ -28,13 +28,13 @@ v = sys.version_info
 
 def read(rel_path):
     here = os.path.abspath(os.path.dirname(__file__))
-    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+    with codecs.open(os.path.join(here, rel_path), "r") as fp:
         return fp.read()
 
 
 def get_version(rel_path):
     for line in read(rel_path).splitlines():
-        if line.startswith('__version__'):
+        if line.startswith("__version__"):
             delim = '"' if '"' in line else "'"
             return line.split(delim)[1]
     else:
@@ -42,7 +42,7 @@ def get_version(rel_path):
 
 
 shell = False
-if os.name in ('nt', 'dos'):
+if os.name in ("nt", "dos"):
     shell = True
     warning = "WARNING: Windows is not officially supported"
     print(warning, file=sys.stderr)
@@ -52,36 +52,25 @@ def main():
     setup(
         # Application name:
         name="Kahi_template",
-
         # Version number (initial):
-        version=get_version('kahi_template/_version.py'),
-
+        version=get_version("kahi_template/_version.py"),
         # Application author details:
         author="Colav",
         author_email="colav@udea.edu.co",
-
         # Packages
-        packages=find_packages(exclude=['tests']),
-
+        packages=find_packages(exclude=["tests"]),
         # Include additional files into the package
         include_package_data=True,
-
         # Details
         url="https://github.com/colav/Kahi_xyz",
         #
         license="BSD",
-
         description="Kahi plugin template",
-
         long_description=open("README.md").read(),
-
         long_description_content_type="text/markdown",
-
         # Dependent packages (distributions)
         # put you packages here
-        install_requires=[
-            'kahi'
-        ],
+        install_requires=["kahi"],
     )
 
 

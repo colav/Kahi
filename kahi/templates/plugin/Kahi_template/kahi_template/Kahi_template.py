@@ -2,7 +2,6 @@ from kahi.KahiBase import KahiBase
 
 
 class Kahi_template(KahiBase):
-
     config = {}
 
     def __init__(self, config):

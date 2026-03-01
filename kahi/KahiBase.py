@@ -1,10 +1,25 @@
+"""Base class that all Kahi plugins must extend."""
 
-class KahiBase:
-    def __init__(self):
-        pass
+from __future__ import annotations
 
-    def empty_affiliation(self):
-        entry = {
+from abc import ABC, abstractmethod
+from typing import Any
+
+
+class KahiBase(ABC):
+    """Abstract base class for Kahi plugins.
+
+    Provides factory methods for common entity schemas used throughout the
+    bibliographic data pipeline.  Subclasses **must** implement :meth:`run`.
+    """
+
+    # ------------------------------------------------------------------
+    # Entity factories
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def empty_affiliation() -> dict[str, Any]:
+        return {
             "updated": [],
             "names": [],
             "aliases": [],
@@ -20,12 +35,12 @@ class KahiBase:
             "ranking": [],
             "description": [],
             "citation_count": [],
-            "products_count": 0
+            "products_count": 0,
         }
-        return entry
 
-    def empty_publisher(self):
-        entry = {
+    @staticmethod
+    def empty_publisher() -> dict[str, Any]:
+        return {
             "updated": [],
             "names": [],
             "aliases": [],
@@ -44,11 +59,11 @@ class KahiBase:
             "ranking": [],
             "description": [],
             "citation_count": [],
-            "products_count": 0
+            "products_count": 0,
         }
-        return entry
 
-    def empty_source(self):
+    @staticmethod
+    def empty_source() -> dict[str, Any]:
         return {
             "updated": [],
             "names": [],
@@ -73,10 +88,11 @@ class KahiBase:
             "subjects": [],
             "ranking": [],
             "citation_count": [],
-            "products_count": 0
+            "products_count": 0,
         }
 
-    def empty_subjects(self):
+    @staticmethod
+    def empty_subjects() -> dict[str, Any]:
         return {
             "updated": [],
             "names": [],
@@ -85,11 +101,12 @@ class KahiBase:
             "external_ids": [],
             "external_urls": [],
             "level": None,
-            "relations": []
+            "relations": [],
         }
 
-    def empty_person(self):
-        entry = {
+    @staticmethod
+    def empty_person() -> dict[str, Any]:
+        return {
             "updated": [],
             "full_name": "",
             "first_names": [],
@@ -108,11 +125,11 @@ class KahiBase:
             "subjects": [],
             "citations_count": [],
             "products_count": 0,
-            "related_works": []
+            "related_works": [],
         }
-        return entry
 
-    def empty_work(self):
+    @staticmethod
+    def empty_work() -> dict[str, Any]:
         return {
             "titles": [],
             "updated": [],
@@ -143,7 +160,8 @@ class KahiBase:
             "topics": [],
         }
 
-    def empty_event(self):
+    @staticmethod
+    def empty_event() -> dict[str, Any]:
         return {
             "titles": [],
             "updated": [],
@@ -156,10 +174,11 @@ class KahiBase:
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
         }
 
-    def empty_project(self):
+    @staticmethod
+    def empty_project() -> dict[str, Any]:
         return {
             "titles": [],
             "updated": [],
@@ -174,10 +193,11 @@ class KahiBase:
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
         }
 
-    def empty_patent(self):
+    @staticmethod
+    def empty_patent() -> dict[str, Any]:
         return {
             "titles": [],
             "updated": [],
@@ -187,10 +207,11 @@ class KahiBase:
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
         }
 
-    def empty_work_other(self):
+    @staticmethod
+    def empty_work_other() -> dict[str, Any]:
         return {
             "titles": [],
             "updated": [],
@@ -204,12 +225,20 @@ class KahiBase:
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
         }
 
-    def run(self):
+    # ------------------------------------------------------------------
+    # Plugin entry point
+    # ------------------------------------------------------------------
+
+    @abstractmethod
+    def run(self) -> int:
+        """Execute the plugin logic. Must be implemented by subclasses.
+
+        Returns
+        -------
+        int
+            Exit status code (0 = success).
         """
-        entry point for the execution of the plugin, this method must be implemented
-        """
-        raise NotImplementedError(
-            self.__class__.__name__ + '.run() not implemented')
+        ...

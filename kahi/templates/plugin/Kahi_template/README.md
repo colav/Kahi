@@ -1,6 +1,6 @@
 <center><img src="https://raw.githubusercontent.com/colav/colav.github.io/master/img/Logo.png"/></center>
 
-# Kahi template plugin 
+# Kahi template plugin
 This is a template for xyz project
 replace template for the name of the plugin everywhere.
 
@@ -14,7 +14,7 @@ What do I need fot this plugin?, it could be external services etc..
 
 ## Package
 Write here how to install this plugin
-usauly is 
+usauly is
 
 `pip install kahi_template`
 
@@ -34,10 +34,7 @@ Those parameters are not really needed in the workflow file, it is just for illu
 
 
 # License
-BSD-3-Clause License 
+BSD-3-Clause License
 
 # Links
 http://colav.udea.edu.co/
-
-
-

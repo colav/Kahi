@@ -1,0 +1,100 @@
+[build-system]
+requires = ["setuptools>=68.0", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Kahi"
+version = "0.1.1-alpha"
+description = "ETL (Extract, Transform and Load) for bibliographic data using an advanced data workflow"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.10"
+authors = [
+    { name = "Colav", email = "colav@udea.edu.co" },
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "pymongo>=4.0",
+]
+
+[project.optional-dependencies]
+all = [
+    "kahi_doaj_sources",
+    "kahi_minciencias_opendata_affiliations",
+    "kahi_minciencias_opendata_person",
+    "kahi_openalex_affiliations",
+    "kahi_openalex_person",
+    "kahi_openalex_sources",
+    "kahi_openalex_subjects",
+    "kahi_openalex_works",
+    "kahi_ranking_udea_works",
+    "kahi_ror_affiliations",
+    "kahi_scholar_works",
+    "kahi_scienti_affiliations",
+    "kahi_scienti_person",
+    "kahi_scienti_sources",
+    "kahi_scimago_sources",
+    "kahi_scopus_works",
+    "kahi_staff_udea_affiliations",
+    "kahi_staff_udea_person",
+    "kahi_wos_works",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4",
+    "mypy>=1.0",
+    "pre-commit>=3.7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/colav/Kahi"
+Repository = "https://github.com/colav/Kahi"
+Issues = "https://github.com/colav/Kahi/issues"
+
+[project.scripts]
+kahi_run = "kahi.cli:run_cli"
+kahi_generate = "kahi.cli:generate_cli"
+
+[tool.setuptools.packages.find]
+include = ["kahi*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+kahi = ["templates/**/*"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Legacy capitalised module names – cannot rename without breaking plugins
+"kahi/Kahi.py" = ["N999"]
+"kahi/KahiBase.py" = ["N999"]
+"kahi/PluginGenerator.py" = ["N999"]
+# Template files are scaffolding code, not meant to pass all rules
+"kahi/templates/**" = ["N801", "N999", "UP009", "UP010", "I001"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

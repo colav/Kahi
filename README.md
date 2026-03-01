@@ -6,7 +6,7 @@ KAHI is a powerful tool by offering a framework to define a workflow of sequenti
 
 # Plugins
 Take a look on plugins examples in the repository
-https://github.com/colav/Kahi_plugins 
+https://github.com/colav/Kahi_plugins
 
 ## Installation
 
@@ -79,10 +79,7 @@ and a basic installable template called Kahi_myplugin will be created.
 If you are interested in contributing to KAHI or creating your own plugins, please refer to the kahi-plugins repository. It contains the necessary resources and documentation to implement new plugins easily. Feel free to submit pull requests or report any issues you encounter.
 
 # License
-BSD-3-Clause License 
+BSD-3-Clause License
 
 # Links
 http://colav.udea.edu.co/
-
-
-
