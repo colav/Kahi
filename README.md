@@ -53,6 +53,31 @@ In the config section, you can specify the MongoDB URL, database name, log datab
 The workflow section contains the sequential tasks of the workflow. Each task is defined with a unique name and specific configuration options based on the data source. In the example above, three tasks are defined: ror_affiliations, staff_affiliations, and scienti_affiliations.
 **Every task should be related to a plugin**
 
+## Pinning a published release
+
+A workflow can refer to a MongoDB publication pointer without embedding a
+versioned collection or release name. KAHI resolves each logical reference once
+when it loads the workflow, validates its audit and existing collections, and
+injects the exact immutable `release_name` into every task that uses it. The
+resolved value is therefore also stored in the normal plugin execution log.
+
+```yaml
+config:
+  release_references:
+    minciencias_open_data_current:
+      database_url: localhost:27017
+      database_name: dam
+      publication_collection: scienti_final_release_publications
+      audit_collection: scienti_final_release_audits
+      expected_entities: [works, projects, patents, events, persons, affiliations]
+workflow:
+  minciencias_opendata_works:
+    release_ref: minciencias_open_data_current
+```
+
+The publication pointer must identify a published release with a passed audit,
+no critical anomalies, matching release metadata, and all expected collections.
+
 Finally, to run the workflow, use the following command:
 ```shell
 kahi_run --workflow worflow.yaml
@@ -83,6 +108,4 @@ BSD-3-Clause License
 
 # Links
 http://colav.udea.edu.co/
-
-
 
