@@ -93,24 +93,24 @@ class Kahi:
             collection for collection in collections.values()
             if collection not in available_collections
         )
-        valid = (
-            release.get("status") == "published"
-            and audit.get("status") == "passed"
-            and audit.get("release_name") == release_name
-            and int(audit.get("critical_anomalies") or 0) == 0
-            and audit.get("collections") == collections
-            and pointer.get("audit") == audit_name
-            and pointer.get("collections") == collections
-            and not missing_collections
-        )
+        valid = all((
+            release.get("status") == "published",
+            audit.get("status") == "passed",
+            audit.get("release_name") == release_name,
+            int(audit.get("critical_anomalies") or 0) == 0,
+            audit.get("collections") == collections,
+            pointer.get("audit") == audit_name,
+            pointer.get("collections") == collections,
+            not missing_collections,
+        ))
         if expected_entities:
-            valid = (
-                valid
-                and set(collections) == expected_entities
-                and int(release.get("entity_count") or 0) == len(expected_entities)
-                and set(materialization_runs) == expected_entities
-                and audit.get("materialization_runs") == materialization_runs
-            )
+            valid = all((
+                valid,
+                set(collections) == expected_entities,
+                int(release.get("entity_count") or 0) == len(expected_entities),
+                set(materialization_runs) == expected_entities,
+                audit.get("materialization_runs") == materialization_runs,
+            ))
         if not valid:
             raise RuntimeError(
                 "release reference {} does not point to a complete audited release".format(
@@ -158,9 +158,11 @@ class Kahi:
     def _completed_log_matches(logs, log_id, task_config):
         """Resume only when the successful task used the same configuration."""
         return any(
-            log.get("_id") == log_id
-            and log.get("status") == 0
-            and log.get("config") == task_config
+            all((
+                log.get("_id") == log_id,
+                log.get("status") == 0,
+                log.get("config") == task_config,
+            ))
             for log in (logs or [])
         )
 
