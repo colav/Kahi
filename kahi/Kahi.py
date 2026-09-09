@@ -8,6 +8,7 @@ import cProfile
 import pstats
 import io
 from pstats import SortKey
+from copy import deepcopy
 
 
 class OrderedLoader(yaml.SafeLoader):
@@ -28,6 +29,7 @@ class Kahi:
         self.workflow = None
         self.config = None
         self.plugins = {}
+        self.resolved_release_references = {}
 
         self.client = None
 
@@ -44,9 +46,125 @@ class Kahi:
             data = yaml.load(stream, Loader=OrderedLoader)
             self.workflow = data["workflow"]
             self.config = data["config"]
+            self._resolve_release_references()
             self.client = MongoClient(self.config["database_url"])
             if self.verbose > 4:
                 print(data)
+
+    def _resolve_release_reference(self, name, definition):
+        """Resolve and validate one immutable release from a published pointer."""
+        database_url = definition.get(
+            "database_url", self.config.get("database_url")
+        )
+        database_name = definition.get("database_name")
+        if not database_url or not database_name:
+            raise ValueError(
+                "release reference {} requires database_url and database_name".format(
+                    name
+                )
+            )
+        publications_name = definition.get(
+            "publication_collection", "scienti_final_release_publications"
+        )
+        audits_name = definition.get(
+            "audit_collection", "scienti_final_release_audits"
+        )
+        pointer_id = definition.get("pointer_id", "current")
+        pointer_field = definition.get("pointer_field", "current_release")
+
+        source_client = MongoClient(database_url)
+        source_db = source_client[database_name]
+        pointer = source_db[publications_name].find_one({"_id": pointer_id}) or {}
+        release_name = str(pointer.get(pointer_field) or "")
+        if not release_name:
+            raise RuntimeError(
+                "release reference {} has no published target".format(name)
+            )
+        release = source_db[publications_name].find_one(
+            {"_id": release_name}
+        ) or {}
+        audit_name = str(release.get("audit") or "")
+        audit = source_db[audits_name].find_one({"_id": audit_name}) or {}
+        collections = release.get("collections") or {}
+        materialization_runs = release.get("materialization_runs") or {}
+        expected_entities = set(definition.get("expected_entities") or [])
+        available_collections = set(source_db.list_collection_names())
+        missing_collections = sorted(
+            collection for collection in collections.values()
+            if collection not in available_collections
+        )
+        valid = all((
+            release.get("status") == "published",
+            audit.get("status") == "passed",
+            audit.get("release_name") == release_name,
+            int(audit.get("critical_anomalies") or 0) == 0,
+            audit.get("collections") == collections,
+            pointer.get("audit") == audit_name,
+            pointer.get("collections") == collections,
+            not missing_collections,
+        ))
+        if expected_entities:
+            valid = all((
+                valid,
+                set(collections) == expected_entities,
+                int(release.get("entity_count") or 0) == len(expected_entities),
+                set(materialization_runs) == expected_entities,
+                audit.get("materialization_runs") == materialization_runs,
+            ))
+        if not valid:
+            raise RuntimeError(
+                "release reference {} does not point to a complete audited release".format(
+                    name
+                )
+            )
+        return {
+            "release_name": release_name,
+            "audit": audit_name,
+            "collections": deepcopy(collections),
+            "materialization_runs": deepcopy(materialization_runs),
+        }
+
+    def _resolve_release_references(self):
+        """Pin every logical release reference once before any plugin runs."""
+        definitions = self.config.get("release_references") or {}
+        resolved = {}
+        for log_id, params in self.workflow.items():
+            if not isinstance(params, dict):
+                continue
+            reference = params.get("release_ref")
+            if not reference:
+                continue
+            if "release_name" in params:
+                raise ValueError(
+                    "workflow task {} cannot define release_ref and release_name".format(
+                        log_id
+                    )
+                )
+            if reference not in definitions:
+                raise ValueError(
+                    "workflow task {} uses unknown release reference {}".format(
+                        log_id, reference
+                    )
+                )
+            if reference not in resolved:
+                resolved[reference] = self._resolve_release_reference(
+                    reference, definitions[reference]
+                )
+            params.pop("release_ref")
+            params["release_name"] = resolved[reference]["release_name"]
+        self.resolved_release_references = resolved
+
+    @staticmethod
+    def _completed_log_matches(logs, log_id, task_config):
+        """Resume only when the successful task used the same configuration."""
+        return any(
+            all((
+                log.get("_id") == log_id,
+                log.get("status") == 0,
+                log.get("config") == task_config,
+            ))
+            for log in (logs or [])
+        )
 
     def load_plugins(self, verbose=0):
         """
@@ -112,13 +230,19 @@ class Kahi:
                 params["task"] = log_split[1]
             else:
                 module_name = log_id
+
+            plugin_config = self.config.copy()
+            plugin_config[module_name] = self.workflow[log_id]
+            if isinstance(plugin_config[module_name], list):
+                for i in range(len(plugin_config[module_name])):
+                    plugin_config[module_name][i]["task"] = params["task"] if "task" in params else None
+            else:
+                plugin_config[module_name]["task"] = params["task"] if "task" in params else None
+
             if self.use_log:
-                if self.log:
-                    for log in self.log:
-                        if log["_id"] == log_id:
-                            if log["status"] == 0:
-                                executed_module = True
-                                break
+                executed_module = self._completed_log_matches(
+                    self.log, log_id, plugin_config[module_name]
+                )
             if executed_module:
                 if self.verbose > 4:
                     print("Skipped plugin: " + self.plugin_prefix + log_id)
@@ -133,13 +257,6 @@ class Kahi:
             plugin_class_version = getattr(
                 self.plugins[module_name + "._version"], "get_version")
 
-            plugin_config = self.config.copy()
-            plugin_config[module_name] = self.workflow[log_id]
-            if isinstance(plugin_config[module_name], list):
-                for i in range(len(plugin_config[module_name])):
-                    plugin_config[module_name][i]["task"] = params["task"] if "task" in params else None
-            else:
-                plugin_config[module_name]["task"] = params["task"] if "task" in params else None
             plugin_instance = plugin_class(config=plugin_config)
 
             run = getattr(plugin_instance, "run")
