@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.3-alpha - 2026-11-06
+## 0.1.3 - 2026-11-06
 
 - Add `kahi.progress.ProgressLogger`, a shared progress reporter for plugins:
   uniform `[plugin:phase] START/progress/DONE` lines with totals, rate, ETA
