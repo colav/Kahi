@@ -155,8 +155,12 @@ class Kahi:
         self.resolved_release_references = resolved
 
     @staticmethod
-    def _completed_log_matches(logs, log_id, task_config):
+    def _completed_log_matches(logs, log_id, task_config, plugin_class=None):
         """Resume only when the successful task used the same configuration."""
+        checkpoint_policy = getattr(plugin_class, "manages_checkpoints", None)
+        if checkpoint_policy is not None and checkpoint_policy(task_config):
+            # The plugin must resolve mutable inputs before deciding to resume.
+            return False
         return any(
             all((
                 log.get("_id") == log_id,
@@ -239,9 +243,13 @@ class Kahi:
             else:
                 plugin_config[module_name]["task"] = params["task"] if "task" in params else None
 
+            plugin_class = getattr(
+                self.plugins[module_name],
+                self.plugin_prefix.capitalize() + module_name)
+
             if self.use_log:
                 executed_module = self._completed_log_matches(
-                    self.log, log_id, plugin_config[module_name]
+                    self.log, log_id, plugin_config[module_name], plugin_class
                 )
             if executed_module:
                 if self.verbose > 4:
@@ -249,10 +257,6 @@ class Kahi:
                 continue
             if self.verbose > 4:
                 print("Running plugin: " + self.plugin_prefix + log_id)
-
-            plugin_class = getattr(
-                self.plugins[module_name],
-                self.plugin_prefix.capitalize() + module_name)
 
             plugin_class_version = getattr(
                 self.plugins[module_name + "._version"], "get_version")
