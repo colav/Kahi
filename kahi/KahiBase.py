@@ -20,7 +20,8 @@ class KahiBase:
             "ranking": [],
             "description": [],
             "citation_count": [],
-            "products_count": 0
+            "products_count": 0,
+            "campuses": []
         }
         return entry
 
