@@ -132,6 +132,7 @@ class KahiBase:
             "references": [],
             "citations_count": [],
             "citations": [],
+            "cited_by_api_url": "",
             "author_count": None,
             "authors": [],
             "source": {},

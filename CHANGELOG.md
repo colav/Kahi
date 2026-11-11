@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4 - 2026-11-10
+
+- Add `cited_by_api_url` to the empty work template (OpenAlex cited-by query
+  URL rebuilt from the work id; the snapshot does not carry it).
+
 ## 0.1.3 - 2026-11-06
 
 - Add `kahi.progress.ProgressLogger`, a shared progress reporter for plugins:
