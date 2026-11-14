@@ -183,13 +183,16 @@ class KahiBase:
         return {
             "titles": [],
             "updated": [],
+            "abstracts": [],
             "types": [],
             "external_ids": [],
             "external_urls": [],
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
+            "primary_topic": {},
+            "topics": [],
         }
 
     def empty_work_other(self):

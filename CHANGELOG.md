@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5 - 2026-11-14
+
+- Add `abstracts`, `primary_topic` and `topics` to the empty patent template,
+  with the same shape as in works (Lens abstracts as inverted index, one entry
+  per language; topics inferred in postcalculations).
+
 ## 0.1.4 - 2026-11-10
 
 - Add `cited_by_api_url` to the empty work template (OpenAlex cited-by query
