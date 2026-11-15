@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6 - 2026-11-14
+
+- Add `age` (default `None`) to the empty person template. Postcalculations
+  computes it from `birthdate` and then clears the birth date, so the published
+  profile carries the age but not the date.
+
 ## 0.1.5 - 2026-11-14
 
 - Add `abstracts`, `primary_topic` and `topics` to the empty patent template,

@@ -105,6 +105,8 @@ class KahiBase:
             "ranking": [],
             "birthplace": {},
             "birthdate": -1,
+            # Completed years at the release date; postcalculations fills it and clears birthdate.
+            "age": None,
             "degrees": [],
             "subjects": [],
             "citations_count": [],
