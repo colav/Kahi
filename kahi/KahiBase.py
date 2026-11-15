@@ -178,7 +178,12 @@ class KahiBase:
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
+            # Text used to infer the topics when the project has no abstract
+            # (e.g. SIIU: general objective and problem statement).
+            "topic_text": "",
+            "primary_topic": {},
+            "topics": []
         }
 
     def empty_patent(self):

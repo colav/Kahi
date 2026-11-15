@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7 - 2026-11-15
+
+- Add `primary_topic`, `topics` and `topic_text` to the empty project template.
+  Topics are inferred in postcalculations from the title and the abstract;
+  `topic_text` holds the text used when the project has no abstract.
+
 ## 0.1.6 - 2026-11-14
 
 - Add `age` (default `None`) to the empty person template. Postcalculations
