@@ -102,5 +102,5 @@ class ProgressLogger:
             elapsed = monotonic() - start
             self.counts.update(extra)
             counts = self._counts_text()
-            self.log(f"DONE {self.processed} reg en {format_duration(elapsed)}"
-                     + (f" | {counts}" if counts else ""))
+            suffix = f" | {counts}" if counts else ""
+            self.log(f"DONE {self.processed} reg en {format_duration(elapsed)}{suffix}")
