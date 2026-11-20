@@ -20,7 +20,8 @@ class KahiBase:
             "ranking": [],
             "description": [],
             "citation_count": [],
-            "products_count": 0
+            "products_count": 0,
+            "campuses": []
         }
         return entry
 
@@ -104,6 +105,8 @@ class KahiBase:
             "ranking": [],
             "birthplace": {},
             "birthdate": -1,
+            # Completed years at the release date; postcalculations fills it and clears birthdate.
+            "age": None,
             "degrees": [],
             "subjects": [],
             "citations_count": [],
@@ -131,6 +134,7 @@ class KahiBase:
             "references": [],
             "citations_count": [],
             "citations": [],
+            "cited_by_api_url": "",
             "author_count": None,
             "authors": [],
             "source": {},
@@ -174,20 +178,28 @@ class KahiBase:
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
+            # Text used to infer the topics when the project has no abstract
+            # (e.g. SIIU: general objective and problem statement).
+            "topic_text": "",
+            "primary_topic": {},
+            "topics": []
         }
 
     def empty_patent(self):
         return {
             "titles": [],
             "updated": [],
+            "abstracts": [],
             "types": [],
             "external_ids": [],
             "external_urls": [],
             "author_count": None,
             "authors": [],
             "ranking": [],
-            "groups": []
+            "groups": [],
+            "primary_topic": {},
+            "topics": [],
         }
 
     def empty_work_other(self):

@@ -136,6 +136,20 @@ workflow:
             {"release_name": "release_v2", "task": None},
         ))
 
+    def test_plugin_checkpoints_take_precedence_over_a_matching_workflow_log(self):
+        class SnapshotPlugin:
+            @staticmethod
+            def manages_checkpoints(config):
+                return config.get("source_mode") == "snapshot"
+
+        for mode in ("snapshot", "legacy"):
+            config = {"source_mode": mode}
+            logs = [{"_id": "affiliations", "status": 0, "config": config}]
+            self.assertEqual(
+                Kahi._completed_log_matches(logs, "affiliations", config, SnapshotPlugin),
+                mode == "legacy",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
